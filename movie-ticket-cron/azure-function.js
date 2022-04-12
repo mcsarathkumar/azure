@@ -9,6 +9,7 @@ module.exports = async function (context, req) {
         }
         const storageFile = req.body.storageFile;
         const fileContents = (await axios.get(storageFile)).data;
+        // If file content is open, then the user is already notified. Exception is thrown to avoid email bombing.
         if (fileContents == 'open') {
             throw new Error('Booking Completed');
         }
@@ -20,6 +21,7 @@ module.exports = async function (context, req) {
         for (const theater of theaters) {
             if (bookmyshow.includes(theater)) {
                 isMovieFound = true;
+                // Save the status as user is notified.
                 const file = new azureBlobStorage.BlockBlobClient(storageFile);
                 const available = 'open';
                 await file.upload(available, available.length);
